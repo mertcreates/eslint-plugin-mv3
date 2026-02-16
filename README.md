@@ -68,7 +68,7 @@ Or use recommended config:
 
 ```json
 {
-  "extends": ["plugin:@mertcreates/mv3/recommended"]
+  "extends": ["plugin:@mfertcreates/mv3/recommended"]
 }
 ```
 
@@ -86,6 +86,8 @@ export default [
 
 The recommended config enables this rule.
 
+<a id="no-execute-script-closure"></a>
+
 ### `@mertcreates/mv3/no-execute-script-closure`
 
 Validates that:
@@ -94,6 +96,10 @@ Validates that:
 - `func` does not capture outer-scope variables
 - `args` is present and array-literal when function parameters exist
 - invocation/config shape stays statically analyzable
+
+#### Incorrect / Correct by covered case
+
+1. Closure capture (outer scope)
 
 Incorrect:
 
@@ -121,6 +127,84 @@ chrome.scripting.executeScript({
   target: { tabId: 1 },
   func: installBridge,
   args: ['outer'],
+});
+```
+
+1. Imported `func`
+
+Incorrect:
+
+```js
+import { installBridge } from './bridge';
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: installBridge,
+});
+```
+
+Correct:
+
+```js
+function installBridge(source) {
+  return source;
+}
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: installBridge,
+  args: ['ok'],
+});
+```
+
+1. Params exist but `args` missing/invalid
+
+Incorrect:
+
+```js
+function installBridge(config) {
+  return config;
+}
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: installBridge,
+});
+```
+
+Correct:
+
+```js
+function installBridge(config) {
+  return config;
+}
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: installBridge,
+  args: [{ source: 'mv3' }],
+});
+```
+
+1. Dynamic/spread config
+
+Incorrect:
+
+```js
+const baseOptions = { target: { tabId: 1 } };
+
+chrome.scripting.executeScript({
+  ...baseOptions,
+  func: () => Date.now(),
+});
+```
+
+Correct:
+
+```js
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: () => Date.now(),
 });
 ```
 
