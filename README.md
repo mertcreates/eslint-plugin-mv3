@@ -68,7 +68,7 @@ Or use recommended config:
 
 ```json
 {
-  "extends": ["plugin:@mfertcreates/mv3/recommended"]
+  "extends": ["plugin:@mertcreates/mv3/recommended"]
 }
 ```
 
