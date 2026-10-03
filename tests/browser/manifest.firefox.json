@@ -1,0 +1,1 @@
+{"manifest_version":3,"name":"MV3 argument acceptance","version":"1.0.0","permissions":["scripting","tabs"],"host_permissions":["http://127.0.0.1/*"],"background":{"scripts":["background.js"]},"browser_specific_settings":{"gecko":{"id":"mv3-acceptance@example.test"}}}

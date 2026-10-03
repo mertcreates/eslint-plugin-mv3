@@ -1,0 +1,338 @@
+{
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:157.0) Gecko/20100101 Firefox/157.0",
+  "results": [
+    {
+      "name": "plain",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Object]",
+            "json": "{\"name\":\"mv3\",\"values\":[1,true,null]}",
+            "keys": [
+              "name",
+              "values"
+            ],
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "bigint",
+      "error": "Error: Unserializable arguments."
+    },
+    {
+      "name": "object-bigint",
+      "error": "Error: Unserializable arguments."
+    },
+    {
+      "name": "array-bigint",
+      "error": "Error: Unserializable arguments."
+    },
+    {
+      "name": "array-cycle",
+      "error": "Error: Unserializable arguments."
+    },
+    {
+      "name": "cycle",
+      "error": "Error: Unserializable arguments."
+    },
+    {
+      "name": "function",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Null]",
+            "json": "null",
+            "keys": null,
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "symbol",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Null]",
+            "json": "null",
+            "keys": null,
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "undefined",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Null]",
+            "json": "null",
+            "keys": null,
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "nan",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Null]",
+            "json": "null",
+            "keys": null,
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "infinity",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Null]",
+            "json": "null",
+            "keys": null,
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "object-loss",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Object]",
+            "json": "{\"number\":null}",
+            "keys": [
+              "number"
+            ],
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "sparse",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Array]",
+            "json": "[null,1]",
+            "keys": [
+              "0",
+              "1"
+            ],
+            "arrayTypes": [
+              "object",
+              "number"
+            ],
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "array-loss",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Array]",
+            "json": "[null,null,null,null,null]",
+            "keys": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "arrayTypes": [
+              "object",
+              "object",
+              "object",
+              "object",
+              "object"
+            ],
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "date",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "string",
+            "tag": "[object String]",
+            "json": "\"2026-01-01T00:00:00.000Z\"",
+            "keys": null,
+            "arrayTypes": null,
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "shared",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": {
+            "type": "object",
+            "tag": "[object Array]",
+            "json": "[{\"ok\":true},{\"ok\":true}]",
+            "keys": [
+              "0",
+              "1"
+            ],
+            "arrayTypes": [
+              "object",
+              "object"
+            ],
+            "nan": false,
+            "infinity": false
+          }
+        }
+      ]
+    }
+  ],
+  "optionResults": [
+    {
+      "name": "null-func",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": true
+        }
+      ]
+    },
+    {
+      "name": "null-files",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-args",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-world",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-allFrames",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-frameIds",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-documentIds",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-injectImmediately",
+      "response": [
+        {
+          "frameId": 0,
+          "documentId": "bb21b30a-ca6d-1b09-5382-a5dc233ab3e3",
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "false-func",
+      "error": "Error: Type error for parameter injection (Error processing func: Expected function instead of false) for scripting.executeScript."
+    }
+  ]
+}

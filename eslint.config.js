@@ -3,6 +3,16 @@ import js from '@eslint/js';
 export default [
   js.configs.recommended,
   {
+    files: ['tests/browser/**/*.js'],
+    languageOptions: {
+      globals: {
+        fetch: 'readonly',
+        navigator: 'readonly',
+        setTimeout: 'readonly',
+      },
+    },
+  },
+  {
     files: ['bench/**/*.js'],
     languageOptions: {
       globals: {

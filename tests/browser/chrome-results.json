@@ -1,0 +1,330 @@
+{
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "results": [
+    {
+      "name": "plain",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{\"name\":\"mv3\",\"values\":[1,true,null]}",
+            "keys": [
+              "name",
+              "values"
+            ],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "bigint",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'args': Error at index 0: Value is unserializable."
+    },
+    {
+      "name": "object-bigint",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "array-bigint",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": [
+              "object"
+            ],
+            "infinity": false,
+            "json": "[null]",
+            "keys": [
+              "0"
+            ],
+            "nan": false,
+            "tag": "[object Array]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "array-cycle",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": [
+              "object"
+            ],
+            "infinity": false,
+            "json": "[{}]",
+            "keys": [
+              "0"
+            ],
+            "nan": false,
+            "tag": "[object Array]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cycle",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "function",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'args': Error at index 0: Value is unserializable."
+    },
+    {
+      "name": "symbol",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'args': Error at index 0: Value is unserializable."
+    },
+    {
+      "name": "undefined",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'args': Error at index 0: Value is unserializable."
+    },
+    {
+      "name": "nan",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'args': Error at index 0: Value is unserializable."
+    },
+    {
+      "name": "infinity",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'args': Error at index 0: Value is unserializable."
+    },
+    {
+      "name": "object-loss",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sparse",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": [
+              "object",
+              "number"
+            ],
+            "infinity": false,
+            "json": "[null,1]",
+            "keys": [
+              "0",
+              "1"
+            ],
+            "nan": false,
+            "tag": "[object Array]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "array-loss",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": [
+              "object",
+              "object",
+              "object",
+              "object",
+              "object"
+            ],
+            "infinity": false,
+            "json": "[null,null,null,null,null]",
+            "keys": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "nan": false,
+            "tag": "[object Array]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "date",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "shared",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": [
+              "object",
+              "object"
+            ],
+            "infinity": false,
+            "json": "[{\"ok\":true},{\"ok\":true}]",
+            "keys": [
+              "0",
+              "1"
+            ],
+            "nan": false,
+            "tag": "[object Array]",
+            "type": "object"
+          }
+        }
+      ]
+    }
+  ],
+  "optionResults": [
+    {
+      "name": "null-func",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": true
+        }
+      ]
+    },
+    {
+      "name": "null-files",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-args",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-world",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-allFrames",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-frameIds",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-documentIds",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "null-injectImmediately",
+      "response": [
+        {
+          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "frameId": 0,
+          "result": 42
+        }
+      ]
+    },
+    {
+      "name": "false-func",
+      "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'func': Invalid type: expected function, found boolean."
+    }
+  ]
+}

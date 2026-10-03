@@ -45,6 +45,23 @@ const lintMessages = async (code) => {
 };
 
 describe('@mertcreates/mv3/no-execute-script-closure', () => {
+  test.each([
+    'const chrome = { scripting: { executeScript() {} } }; const TOP = 1; chrome.scripting.executeScript({ func: () => TOP });',
+    'const scripting = "other"; const executeScript = "run"; const TOP = 1; chrome[scripting][executeScript]({ func: () => TOP });',
+    'let execute = chrome.scripting.executeScript; execute = () => {}; const TOP = 1; execute({ func: () => TOP });',
+  ])('ignores a call that is not the extension API: %s', async (code) => {
+    expect(await lintMessages(code)).toHaveLength(0);
+  });
+
+  test('checks closures in a local constant options object', async () => {
+    const messages = await lintMessages(`
+      const TOP = 1;
+      const options = { target: { tabId: 1 }, func: () => TOP };
+      chrome.scripting.executeScript(options);
+    `);
+    expect(messages.map(({ messageId }) => messageId)).toEqual(['closureCapture']);
+  });
+
   test('does not silently pass parsing failures', async () => {
     await expect(lintMessages('const = ;')).rejects.toThrow('Unexpected lint diagnostics');
   });
@@ -167,7 +184,7 @@ describe('@mertcreates/mv3/no-execute-script-closure', () => {
       });
     `);
 
-    expect(messages.some((message) => message.message.includes('`args` must be an array literal'))).toBe(true);
+    expect(messages.map(({ messageId }) => messageId)).toEqual(['invalidArgs']);
   });
 
   test('passes with globals and nested local references', async () => {
@@ -243,7 +260,7 @@ describe('@mertcreates/mv3/no-execute-script-closure', () => {
     expect(messages.some((message) => message.message.includes('captures outer variable `TOP`'))).toBe(true);
   });
 
-  test('fails when executeScript options use spread config', async () => {
+  test('accepts a known spread config', async () => {
     const messages = await lintMessages(`
       const options = { target: { tabId: 1 } };
 
@@ -253,7 +270,7 @@ describe('@mertcreates/mv3/no-execute-script-closure', () => {
       });
     `);
 
-    expect(messages.some((message) => message.message.includes('no spread/dynamic config'))).toBe(true);
+    expect(messages).toHaveLength(0);
   });
 
   test('fails when executeScript is invoked via .call', async () => {
@@ -292,7 +309,7 @@ describe('@mertcreates/mv3/no-execute-script-closure', () => {
 
   test('fails when executeScript.apply args are dynamic', async () => {
     const messages = await lintMessages(`
-      const invokeArgs = [{ target: { tabId: 1 }, func: () => Date.now() }];
+      const invokeArgs = getArguments();
       chrome.scripting.executeScript.apply(chrome.scripting, invokeArgs);
     `);
 
@@ -354,7 +371,7 @@ describe('@mertcreates/mv3/no-execute-script-closure', () => {
 
   test('fails when Reflect.apply invocation is dynamic', async () => {
     const messages = await lintMessages(`
-      const invokeArgs = [{ target: { tabId: 1 }, func: () => Date.now() }];
+      const invokeArgs = getArguments();
       Reflect.apply(chrome.scripting.executeScript, chrome.scripting, invokeArgs);
     `);
 

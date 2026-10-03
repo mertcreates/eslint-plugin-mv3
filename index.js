@@ -1,7 +1,12 @@
 import noExecuteScriptClosureRule from './rules/no-execute-script-closure.js';
 
+import argumentLoss from './rules/no-execute-script-argument-loss.js';
+import validOptions from './rules/valid-execute-script-options.js';
+
 export const rules = {
   'no-execute-script-closure': noExecuteScriptClosureRule,
+  'valid-execute-script-options': validOptions,
+  'no-execute-script-argument-loss': argumentLoss,
 };
 
 const plugin = {

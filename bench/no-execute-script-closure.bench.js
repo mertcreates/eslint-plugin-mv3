@@ -1,8 +1,8 @@
 import { ESLint } from 'eslint';
 
-import rule from '../rules/no-execute-script-closure.js';
+import plugin from '../index.js';
 
-const RULE_ID = '@mertcreates/mv3/no-execute-script-closure';
+const RULE_IDS = Object.keys(plugin.rules).map((name) => `@mertcreates/mv3/${name}`);
 
 const parsePositiveInt = (value, fallback) => {
   const parsed = Number.parseInt(value ?? '', 10);
@@ -26,14 +26,8 @@ const createLinter = ({ enableRule }) => {
   };
 
   if (enableRule) {
-    config.plugins = {
-      '@mertcreates/mv3': {
-        rules: {
-          'no-execute-script-closure': rule,
-        },
-      },
-    };
-    config.rules[RULE_ID] = 'error';
+    config.plugins = { '@mertcreates/mv3': plugin };
+    for (const id of RULE_IDS) config.rules[id] = 'error';
   }
 
   return new ESLint({
@@ -140,7 +134,7 @@ const makeAliasMazeScenario = (count) => {
 };
 
 const makeDynamicApplyScenario = (count) => {
-  const lines = ['const tabId = 1;', 'const invokeArgs = [{ target: { tabId }, func: () => Date.now() }];'];
+  const lines = ['const tabId = 1;', 'const invokeArgs = getArguments();'];
 
   for (let i = 0; i < count; i += 1) {
     lines.push('chrome.scripting.executeScript.apply(chrome.scripting, invokeArgs);');
@@ -191,7 +185,25 @@ const makeMixedWorstCaseScenario = (count) => {
   return lines.join('\n');
 };
 
+const makeSharedPayloadScenario = (count, loss = false) => {
+  const lines = [
+    loss ? 'const leaf={callback:()=>1};' : 'const leaf={ok:true};',
+    'const payload=[' + Array(2000).fill('leaf').join(',') + '];',
+    'const options={target:{tabId:1},func:(x)=>x,args:[payload]};',
+  ];
+  for (let i = 0; i < count; i++) lines.push('chrome.scripting.executeScript(options);');
+  return lines.join('\n');
+};
+
 const scenarios = [
+  {
+    name: 'shared-payload',
+    build: () => makeSharedPayloadScenario(2000 * SCALE),
+  },
+  {
+    name: 'shared-loss-payload',
+    build: () => makeSharedPayloadScenario(2000 * SCALE, true),
+  },
   {
     name: 'noise-baseline-5k',
     build: () => makeNoiseScenario(BASELINE_NOISE_COUNT * SCALE),
@@ -251,7 +263,9 @@ const runScenario = async (ruleLinter, baselineLinter, scenario) => {
     const ruleRun = await lintWithTiming(ruleLinter, code, `${scenario.name}.rule.${i}.js`);
     const ruleHeapAfter = process.memoryUsage().heapUsed;
 
-    const messages = ruleRun.result.messages.filter((message) => message.ruleId === RULE_ID);
+    if (ruleRun.result.messages.some((message) => message.fatal || !RULE_IDS.includes(message.ruleId)))
+      throw new Error('Unexpected benchmark diagnostic');
+    const messages = ruleRun.result.messages;
 
     baselineTimings.push(baseline.durationMs);
     ruleTimings.push(ruleRun.durationMs);
