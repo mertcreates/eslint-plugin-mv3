@@ -1,6 +1,6 @@
 {
   "name": "@mertcreates/eslint-plugin-mv3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ESLint rules for Manifest V3 extension safety (e.g., catching executeScript closure traps).",
   "author": "Mert Ercan <me@mertercan.com> (https://mertercan.com)",
   "type": "module",
@@ -19,6 +19,7 @@
     "test": "bun test",
     "lint": "eslint .",
     "check": "npm run lint && npm run test",
+    "test:smoke": "node ./scripts/recommended.smoke.js",
     "bench": "node ./bench/no-execute-script-closure.bench.js"
   },
   "keywords": [
@@ -45,9 +46,10 @@
     "url": "https://github.com/sponsors/mertcreates"
   },
   "peerDependencies": {
-    "eslint": ">=8.50.0 <10"
+    "eslint": ">=8.50.0 <11"
   },
   "devDependencies": {
+    "@eslint/js": "^9.38.0",
     "eslint": "^9.38.0"
   }
 }

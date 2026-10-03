@@ -21,8 +21,8 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - name: Upgrade npm (OIDC required)
-        run: npm i -g npm@latest
+      - name: Setup npm for trusted publishing
+        run: npm i -g npm@11.6.2
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1

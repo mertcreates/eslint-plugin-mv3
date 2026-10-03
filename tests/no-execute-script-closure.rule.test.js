@@ -4,15 +4,18 @@ import { ESLint } from 'eslint';
 import mainWorldExecuteScriptNoClosureRule from '../rules/no-execute-script-closure.js';
 
 const RULE_ID = '@mertcreates/mv3/no-execute-script-closure';
+const eslintMajor = Number(ESLint.version.split('.')[0]);
+const Linter = eslintMajor === 8 ? (await import('eslint/use-at-your-own-risk')).default.FlatESLint : ESLint;
 
 const createLinter = () =>
-  new ESLint({
+  new Linter({
     overrideConfigFile: true,
     overrideConfig: [
       {
         languageOptions: {
           ecmaVersion: 2020,
           sourceType: 'module',
+          parserOptions: { ecmaFeatures: { jsx: true } },
         },
         plugins: {
           '@mertcreates/mv3': {
@@ -32,10 +35,46 @@ const lintMessages = async (code) => {
   const linter = createLinter();
   const [result] = await linter.lintText(code, { filePath: 'fixture.js' });
 
-  return result.messages.filter((message) => message.ruleId === RULE_ID);
+  const unexpectedMessages = result.messages.filter((message) => message.ruleId !== RULE_ID || message.fatal);
+
+  if (unexpectedMessages.length > 0) {
+    throw new Error(`Unexpected lint diagnostics: ${JSON.stringify(unexpectedMessages)}`);
+  }
+
+  return result.messages;
 };
 
 describe('@mertcreates/mv3/no-execute-script-closure', () => {
+  test('does not silently pass parsing failures', async () => {
+    await expect(lintMessages('const = ;')).rejects.toThrow('Unexpected lint diagnostics');
+  });
+
+  test.skipIf(eslintMajor < 10)('reports outer JSX component references', async () => {
+    const messages = await lintMessages(`
+      const Card = () => null;
+      chrome.scripting.executeScript({
+        target: { tabId: 1 },
+        func: () => <Card />,
+      });
+    `);
+
+    expect(messages.map(({ messageId }) => messageId)).toEqual(['closureCapture']);
+  });
+
+  test('passes when a JSX component is declared inside the injected function', async () => {
+    const messages = await lintMessages(`
+      chrome.scripting.executeScript({
+        target: { tabId: 1 },
+        func: () => {
+          const Card = () => null;
+          return <Card />;
+        },
+      });
+    `);
+
+    expect(messages).toHaveLength(0);
+  });
+
   test('passes when inline func is self-contained and args are explicit', async () => {
     const messages = await lintMessages(`
       chrome.scripting.executeScript({

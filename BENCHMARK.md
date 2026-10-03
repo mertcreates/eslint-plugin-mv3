@@ -1,9 +1,8 @@
-# Benchmark Report
+# Benchmark report
 
-This file summarizes the latest benchmark run for
-`@mertcreates/mv3/no-execute-script-closure` in a human-readable format.
+Benchmark results for `@mertcreates/mv3/no-execute-script-closure`.
 
-## Run Setup
+## Run setup
 
 - Date: 2026-02-15
 - Command:
@@ -12,21 +11,22 @@ This file summarizes the latest benchmark run for
 BENCH_SCALE=1 BENCH_WARMUP=2 BENCH_RUNS=5 npm run bench
 ```
 
-- For every scenario, we measure two things:
+Each scenario measures:
+
 - ESLint core overhead (rule disabled)
 - ESLint + plugin rule (rule enabled)
 
-The reported **Net Rule Cost** is:
+Net rule cost is:
 
 `max(rule_enabled_time - eslint_core_overhead, 0)`
 
-## What To Look At
+## Reading the results
 
-- If you care about plugin impact, focus on **Net Rule Cost (median)**.
+- Net rule cost (median) measures the time the rule adds to linting.
 - `P95` values show occasional slow runs (jitter / GC / machine load).
 - High message counts can increase runtime because ESLint has to materialize many diagnostics.
 
-## Results (Latest)
+## Results
 
 | Scenario | Approx size | Rule enabled (median) | ESLint core (median) | Net Rule Cost (median) | Net Rule Cost (P95) | Avg diagnostics |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -37,11 +37,10 @@ The reported **Net Rule Cost** is:
 | `dynamic-apply-storm` | 4,002 lines / 283.3 KB | 71.42 ms | 64.69 ms | **7.98 ms** | 30.92 ms | 4,000 |
 | `mixed-worst-case` | 30,006 lines / 537.4 KB | 156.27 ms | 140.08 ms | **16.19 ms** | 21.44 ms | 9,600 |
 
-## Practical Takeaways
+## Summary
 
-- On the 5k baseline file, plugin overhead is low: about **3 ms median**.
-- In heavier real-world style stress (`mixed-worst-case`), net cost is still moderate: about **16 ms median**.
-- Most total lint time is still ESLint core parsing/traversal, not plugin logic.
+- The rule adds about 3 ms median on the 5k baseline file and 16 ms on the `mixed-worst-case` synthetic file.
+- ESLint core parsing and traversal account for most total lint time in these scenarios.
 
 ## Reproducing
 

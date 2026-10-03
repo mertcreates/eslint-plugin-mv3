@@ -5,13 +5,13 @@
 [![license](https://img.shields.io/npm/l/@mertcreates/eslint-plugin-mv3.svg)](LICENSE.md)
 [![CI](https://github.com/mertcreates/eslint-plugin-mv3/actions/workflows/ci.yml/badge.svg)](https://github.com/mertcreates/eslint-plugin-mv3/actions/workflows/ci.yml)
 
-ESLint rule(s) for MV3-safe `scripting.executeScript` usage.
+ESLint rules for Manifest V3 `scripting.executeScript` calls.
 
-It enforces that injected `func` code is self-contained, statically analyzable, and safe across Main World boundaries.
+The plugin checks that injected functions use local variables and explicit inputs passed through `args`.
 
 ## Contents
 
-- [The Problem](#the-problem)
+- [The problem](#the-problem)
 - [Features](#features)
 - [Install](#install)
 - [Usage (eslintrc)](#usage-eslintrc)
@@ -22,11 +22,11 @@ It enforces that injected `func` code is self-contained, statically analyzable, 
 - [Benchmarks](#benchmarks)
 - [License](#license)
 
-## The Problem
+## The problem
 
 When using Manifest V3 `scripting.executeScript({ func })`, the injected
-function is serialized and executed in Main World. Outer-scope values are not
-carried with it.
+function is serialized and executed in the target page's execution world.
+Each injected function needs its own variables or inputs passed through `args`.
 
 If injected code references variables outside its own scope, it can fail at
 runtime with `ReferenceError: ... is not defined`. This plugin catches those
@@ -55,6 +55,8 @@ bun add -D @mertcreates/eslint-plugin-mv3
 
 ## Usage (eslintrc)
 
+Use this format with ESLint 8, or ESLint 9 with `ESLINT_USE_FLAT_CONFIG=false`.
+
 ```json
 {
   "plugins": ["@mertcreates/mv3"],
@@ -64,15 +66,9 @@ bun add -D @mertcreates/eslint-plugin-mv3
 }
 ```
 
-Or use recommended config:
-
-```json
-{
-  "extends": ["plugin:@mertcreates/mv3/recommended"]
-}
-```
-
 ## Usage (flat config)
+
+The recommended config uses flat config, which ESLint 10 requires.
 
 ```js
 import mv3Plugin from '@mertcreates/eslint-plugin-mv3';
@@ -93,11 +89,11 @@ The recommended config enables this rule.
 Validates that:
 
 - `func` is local and resolvable in the same file
-- `func` does not capture outer-scope variables
+- `func` uses variables declared within the function or globals available in the target world
 - `args` is present and array-literal when function parameters exist
 - invocation/config shape stays statically analyzable
 
-#### Incorrect / Correct by covered case
+#### Examples
 
 1. Closure capture (outer scope)
 
@@ -157,7 +153,7 @@ chrome.scripting.executeScript({
 });
 ```
 
-1. Params exist but `args` missing/invalid
+1. Function inputs through `args`
 
 Incorrect:
 
@@ -210,12 +206,14 @@ chrome.scripting.executeScript({
 
 ## Options
 
-No rule options right now. The rule is intentionally strict and zero-config.
+Enable the rule with `"error"` or `"warn"` without an options object.
 
 ## Compatibility
 
-- ESLint: `>=8.50.0 <10`
+- ESLint: `>=8.50.0 <11`
 - Node: versions supported by your ESLint runtime
+- ESLint 10 requires Node `^20.19.0 || ^22.13.0 || >=24` and flat config.
+- ESLint 10 also tracks JSX component references, allowing this rule to detect outer-scope components used by injected functions.
 
 ## Benchmarks
 
@@ -225,7 +223,7 @@ Benchmarks separate:
 - Rule-on cost
 - Net rule cost (`rule-on - overhead`)
 
-Latest run highlights (`BENCH_SCALE=1 BENCH_WARMUP=2 BENCH_RUNS=5`):
+Measured on 2026-02-15 with `BENCH_SCALE=1 BENCH_WARMUP=2 BENCH_RUNS=5`:
 
 - `noise-baseline-5k`: net median rule cost ~`2.96ms`
 - `mixed-worst-case` (30k lines): net median rule cost ~`16.19ms`
