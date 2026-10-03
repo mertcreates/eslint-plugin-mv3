@@ -276,3 +276,37 @@ test('treats setter side effects as uncertain without executing user code', asyn
   const code = 'const data={bad:undefined};const object={set value(x){data.bad=x}};object.value=1;' + payload('data');
   expect(await lint(code, lossId)).toHaveLength(0);
 });
+
+const closureId = '@mertcreates/mv3/no-execute-script-closure';
+
+test.each(Object.keys(plugin.rules))('handles exported self-referencing methods with %s enabled', async (name) => {
+  const code = 'export const commands={open(){},again(){return commands.open()}};';
+  expect(await lint(code, `@mertcreates/mv3/${name}`)).toHaveLength(0);
+});
+
+const listenerChecks = [
+  [closureId, 'const OUTER=1;' + call('{target:{tabId:1},func:()=>OUTER}'), 'closureCapture'],
+  [optionsId, call('{target:{tabId:1},func:()=>1,world:"invalid"}'), 'invalidWorld'],
+  [lossId, payload('undefined'), 'topLevelLoss'],
+];
+
+test.each([false, true].flatMap((conditional) => listenerChecks.map((check) => [conditional, ...check])))(
+  'keeps checks after global event registration (conditional=%s, rule=%s)',
+  async (conditional, rule, injection, id) => {
+    const registration = "win.addEventListener('message',()=>win.postMessage('ready','*'));";
+    const setup = 'const win=window;' + (conditional ? `if(flag){${registration}}` : registration);
+    expect((await lint(setup + injection, rule)).map((message) => message.messageId)).toEqual([id]);
+  }
+);
+
+test('keeps API paths uncertain when the global object is passed to unknown code', async () => {
+  expect(await lint('const win=window;replaceGlobals(win);' + call('{}'))).toHaveLength(0);
+});
+
+test.each(['()=>{win.chrome={}}', '()=>replaceGlobals(win)', '()=>win'])(
+  'keeps API paths uncertain when a callback mutates or exposes globals %s',
+  async (callback) => {
+    const code = `const win=window;win.addEventListener('message',${callback});` + call('{}');
+    expect(await lint(code)).toHaveLength(0);
+  }
+);
