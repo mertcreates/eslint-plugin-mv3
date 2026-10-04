@@ -80,9 +80,10 @@ export default [
 
 ## Rules
 
-The recommended config enables `no-execute-script-closure`. Enable the options
-and argument transfer rules explicitly with the [configuration below](#opt-in-injection-checks).
-Each rule accepts `"error"` or `"warn"` and takes no options.
+The recommended config enables `no-execute-script-closure`. The options,
+argument-transfer, and MAIN-world policy rules are opt-in; see the
+[configuration below](#opt-in-injection-checks). Each rule accepts `"error"` or
+`"warn"` and takes no options.
 
 <a id="no-execute-script-closure"></a>
 
@@ -200,7 +201,7 @@ chrome.scripting.executeScript(options);
 
 ### Opt-in injection checks
 
-These two rules are opt-in. Add either or both alongside the recommended config:
+These three rules are opt-in. Add any of them alongside the recommended config:
 
 ```js
 import mv3Plugin from '@mertcreates/eslint-plugin-mv3';
@@ -211,6 +212,7 @@ export default [
     rules: {
       '@mertcreates/mv3/valid-execute-script-options': 'error',
       '@mertcreates/mv3/no-execute-script-argument-loss': 'error',
+      '@mertcreates/mv3/no-main-world': 'error',
     },
   },
 ];
@@ -226,6 +228,11 @@ Reports invalid `executeScript` options when it can determine the values:
 - Use `args` with `func`.
 - Provide `target` and `target.tabId`.
 - Use valid types for `func`, `files`, `args`, `world`, `injectImmediately`, and target fields.
+- Pass a function declaration, function expression, or arrow function that can be
+  reconstructed as a standalone function. Object and class method shorthand
+  cannot.
+- Do not pass a generator function: `executeScript` calls it but does not advance
+  the iterator, so its body does not run.
 - Set `world` to `ISOLATED` or `MAIN`.
 - Choose `allFrames: true` or `frameIds`.
 - Choose `documentIds` or `frameIds`.
@@ -294,13 +301,95 @@ chrome.scripting.executeScript({
 });
 ```
 
+#### Passing a method or generator
+
+`func` is serialized and reconstructed as a standalone function. A method such
+as `readTitle() {}` stringifies to method syntax, which cannot be used as a
+standalone function expression. Define it as a declaration, function expression,
+or arrow function instead. [MDN documents this serialization failure and the
+different error reporting in Firefox and Chrome.](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/executeScript)
+
+```js
+const actions = {
+  readTitle() {
+    return document.title;
+  },
+};
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: actions.readTitle, // reported
+});
+
+function readTitle() {
+  return document.title;
+}
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: readTitle,
+});
+```
+
+A generator function is callable, but calling it only creates an iterator. Since
+`executeScript` does not call `.next()`, the generator body never runs:
+
+```js
+function* readTitle() {
+  yield document.title;
+}
+
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  func: readTitle, // reported
+});
+```
+
+Analysis stops at methods on constructed class instances. For those member
+expressions, the closure rule reports an unresolved function because it cannot
+identify the runtime object or prototype.
+
+<a id="no-main-world"></a>
+
+### `@mertcreates/mv3/no-main-world`
+
+Enable this rule when the project requires injected code to stay in the isolated
+world. `world: 'MAIN'` is a supported feature and can be necessary when injected
+code must use JavaScript values created by the page. Page scripts and injected
+code share a JavaScript world in `MAIN`, so page scripts can change shared
+globals and page-defined values that the injected code uses. `ISOLATED` runs in
+a separate JavaScript environment. Chrome and Firefox also default an omitted
+`world` to `ISOLATED`. See the
+[Chrome `scripting` reference](https://developer.chrome.com/docs/extensions/reference/api/scripting)
+and [MDN `ExecutionWorld`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/ExecutionWorld)
+for the documented isolation boundary.
+
+The rule reports statically resolved `world: 'MAIN'` values on
+`chrome.scripting.executeScript` and `browser.scripting.executeScript` calls. It
+accepts an omitted world or explicit `ISOLATED`, and ignores dynamic or unknown
+values.
+
+```js
+chrome.scripting.executeScript({
+  target: { tabId: 1 },
+  world: 'MAIN', // reported when the rule is enabled
+  func: () => document.title,
+});
+```
+
 <a id="no-execute-script-argument-loss"></a>
 
 ### `@mertcreates/mv3/no-execute-script-argument-loss`
 
-Checks `args` for values that cause rejection or data loss in both tested browsers.
+Checks `args` for values that cause rejection or data loss in Chrome or Firefox.
 Each message includes the path to the value, such as `args[0].settings.callback`.
-The outcomes below come from calls in Chrome 154 and Firefox 157.
+The earlier cross-browser cases below were run in Chrome 154 and Firefox 157.
+We ran the additional built-in cases in Chrome 154. We could not run the Firefox
+fixture for those cases, so their Firefox outcomes are inferred from MDN's
+JSON-serializable argument requirement and Gecko's current
+`JSON.stringify(args)` implementation. See
+[Chrome's API reference](https://developer.chrome.com/docs/extensions/reference/api/scripting#method-executeScript)
+and [MDN's `executeScript()` reference](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/executeScript).
 
 | Value and position | Chrome 154 | Firefox 157 |
 | --- | --- | --- |
@@ -311,10 +400,21 @@ The outcomes below come from calls in Chrome 154 and Firefox 157.
 | Function, Symbol, undefined, NaN, Infinity in a nested array | Converts to `null` | Converts to `null` |
 | BigInt in an object field or nested array | Omits field or converts element to `null` | Rejects |
 | Circular reference | Loses circular reference | Rejects |
+| Date | Becomes an empty object; timestamp is lost | Becomes an ISO string, not a `Date` |
+| Map, Set, RegExp, URLSearchParams | Serializes as a plain object; built-in data is lost | `JSON.stringify` produces `{}`; built-in data is lost |
+| URL | Serializes as a plain object | Calls `URL.toJSON()` and serializes the href as a string |
+| Uint8Array | Rejects as unserializable | `JSON.stringify` produces a plain object with numeric index keys (for example, `{"0":1,"1":2}`); typed-array identity is lost |
+| ArrayBuffer | Rejects as unserializable | `JSON.stringify` produces `{}`; buffer bytes are lost |
 
-When a browser rejects an argument, the injection fails. When it drops a field or
-converts a value to `null`, the injected function receives changed data. The rule's
-message describes what each tested browser does.
+In the Chrome fixture, an object method and a method read from a class instance
+each returned `null` and left the page state empty. A function declaration
+returned the page title and updated the state. A generator returned an empty
+object without running its body. The page-world sentinel was visible with `MAIN`
+and hidden when `world` was omitted or set to `ISOLATED`.
+
+A rejected argument prevents injection. A dropped field or a value converted to
+`null` changes what the injected function receives. The diagnostics describe
+these browser-specific outcomes.
 
 #### A callback field disappears during transfer
 
@@ -371,12 +471,15 @@ chrome.scripting.executeScript({
 });
 ```
 
-The rule accepts JSON values and repeated references to an object that has no
-circular references. It also accepts `Date`. Chrome 154 converts a date to `{}`;
-Firefox 157 converts it to an ISO string. Pass a date as a string when the
-receiving code needs the same value in both browsers.
-Fix invalid options combinations first. The rule skips argument transfer checks
-for those calls until the options are valid.
+The rule accepts JSON values and repeated references to an object, as long as
+the object graph has no cycles. It reports `Date` because Chrome 154 drops its
+timestamp and Firefox 157 turns it into an ISO string. Neither browser passes a
+`Date` object to the injected function. Pass an ISO string explicitly. If the
+injected code needs Date methods, construct a `Date` there. The rule also
+reports Map, Set, RegExp, URL, URLSearchParams, Uint8Array, and ArrayBuffer
+because their extension API transfer does not preserve the built-in value as a
+usable page-side object. Fix invalid option combinations first. The rule skips
+argument transfer checks for those calls until the options are valid.
 
 Browser fixtures, raw observations, and reproduction instructions are in
 [tests/browser](https://github.com/mertcreates/eslint-plugin-mv3/tree/main/tests/browser).
@@ -394,6 +497,13 @@ flow the rules cannot follow. Objects captured by functions that may run later
 are also uncertain if their contents can change. Serialization hooks can make
 values uncertain for later calls too.
 
+The argument rule recognizes direct and locally aliased global constructors for
+Date, Map, Set, RegExp, URL, URLSearchParams, Uint8Array, and ArrayBuffer, plus
+regular expression literals. It does not follow imported constructors,
+constructed class instances, cross-file prototype changes, or unknown
+constructor results. Statically assigned serializers and values that escape to
+unknown code remain uncertain.
+
 The options and argument transfer rules report only problems they can prove.
 The closure rule reports `dynamicConfig` when it cannot resolve the options.
 The rules follow variable bindings to distinguish the browser APIs from local
@@ -408,7 +518,7 @@ objects named `chrome` or `browser`, and to account for reassigned API aliases.
 
 ## Benchmarks
 
-The benchmark compares lint time with all three rules enabled against ESLint with
+The benchmark compares lint time with all four rules enabled against ESLint with
 the rules disabled. It covers large files and a shared payload reused across
 2,000 injection calls.
 

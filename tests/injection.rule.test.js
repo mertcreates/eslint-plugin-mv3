@@ -6,6 +6,8 @@ const Linter =
     ? (await import('eslint/use-at-your-own-risk')).default.FlatESLint
     : ESLint;
 const optionsId = '@mertcreates/mv3/valid-execute-script-options';
+const closureId = '@mertcreates/mv3/no-execute-script-closure';
+const noMainWorldId = '@mertcreates/mv3/no-main-world';
 const lint = async (code, rule = optionsId) => {
   const linter = new Linter({
     overrideConfigFile: true,
@@ -43,12 +45,101 @@ test.each([
   '{target:{tabId:1},files:["x.js"]}',
   '{target:{tabId:1,allFrames:false,frameIds:[0]},func:()=>1}',
   '{target:{tabId:1,allFrames:true,documentIds:["x"]},func:()=>1}',
+  '{target:{tabId:1},func:()=>1,world:"MAIN"}',
   '{...unknown}',
   '{func:()=>1,target:{...unknown}}',
   '{func:()=>1,target:{tabId:1},world:unknown}',
   '{func:()=>1,target:{tabId:1},files:undefined}',
 ])('accepts valid or uncertain options %s', async (options) => {
   expect(await lint(call(options))).toHaveLength(0);
+});
+
+test.each([
+  [
+    'direct object method',
+    'const actions={readTitle(){return document.title}};chrome.scripting.executeScript({target:{tabId:1},func:actions.readTitle});',
+  ],
+  [
+    'method alias in a spread options object',
+    'const actions={readTitle(){return document.title}};const readTitle=actions.readTitle;const base={target:{tabId:1},func:readTitle};const options={...base};const run=browser.scripting.executeScript;run(options);',
+  ],
+])('reports method-syntax injected functions: %s', async (_name, code) => {
+  expect((await lint(code)).map((message) => message.messageId)).toEqual(['methodFunction']);
+});
+
+test.each([
+  [
+    'function declaration',
+    'function readTitle(){return document.title}chrome.scripting.executeScript({target:{tabId:1},func:readTitle});',
+  ],
+  [
+    'function expression',
+    'const readTitle=function(){return document.title};chrome.scripting.executeScript({target:{tabId:1},func:readTitle});',
+  ],
+  ['arrow function', 'const readTitle=()=>document.title;chrome.scripting.executeScript({target:{tabId:1},func:readTitle});'],
+  [
+    'object property function expression',
+    'const actions={readTitle:function(){return document.title}};chrome.scripting.executeScript({target:{tabId:1},func:actions.readTitle});',
+  ],
+  [
+    'object property arrow function',
+    'const actions={readTitle:()=>document.title};chrome.scripting.executeScript({target:{tabId:1},func:actions.readTitle});',
+  ],
+  [
+    'unresolved class instance method',
+    'class Actions{readTitle(){return document.title}}const actions=new Actions();chrome.scripting.executeScript({target:{tabId:1},func:actions.readTitle});',
+  ],
+])('accepts standalone functions and leaves unresolved instance methods alone: %s', async (_name, code) => {
+  expect(await lint(code)).toHaveLength(0);
+});
+
+test('leaves constructed class methods unresolved for the closure rule', async () => {
+  const code =
+    'class Actions{readTitle(){return document.title}}const actions=new Actions();' +
+    'chrome.scripting.executeScript({target:{tabId:1},func:actions.readTitle});';
+  expect((await lint(code, closureId)).map((message) => message.messageId)).toEqual(['unresolvedFunc']);
+});
+
+test.each([
+  [
+    'generator declaration',
+    'function* readTitle(){return document.title}chrome.scripting.executeScript({target:{tabId:1},func:readTitle});',
+  ],
+  [
+    'async generator alias in options',
+    'const readTitle=async function*(){return document.title};const options={target:{tabId:1},func:readTitle};chrome.scripting.executeScript(options);',
+  ],
+])('reports generator injected functions: %s', async (_name, code) => {
+  const messages = await lint(code);
+  expect(messages.map((message) => message.messageId)).toEqual(['generatorFunction']);
+  expect(messages[0].message).toContain('executeScript calls this generator function');
+  expect(messages[0].message).toContain('does not advance its iterator');
+  expect(messages[0].message).toContain('the generator body does not run');
+});
+
+test.each([
+  'const readTitle=async()=>document.title;chrome.scripting.executeScript({target:{tabId:1},func:readTitle});',
+  'const readTitle=async function(){return document.title};chrome.scripting.executeScript({target:{tabId:1},func:readTitle});',
+])('accepts non-generator async functions %s', async (code) => {
+  expect(await lint(code)).toHaveLength(0);
+});
+
+test('opt-in no-main-world policy resolves aliases and option spreads', async () => {
+  const code =
+    'const pageWorld="MAIN";const base={target:{tabId:1},func:()=>1,world:pageWorld};' +
+    'const options={...base};const run=browser.scripting.executeScript;run(options);';
+  const messages = await lint(code, noMainWorldId);
+  expect(messages.map((message) => message.messageId)).toEqual(['mainWorld']);
+  expect(messages[0].message).toContain('page JavaScript environment');
+  expect(Object.hasOwn(plugin.configs.recommended.rules, noMainWorldId)).toBe(false);
+});
+
+test.each([
+  '{target:{tabId:1},func:()=>1}',
+  '{target:{tabId:1},func:()=>1,world:"ISOLATED"}',
+  '{target:{tabId:1},func:()=>1,world:runtimeWorld}',
+])('allows omitted, isolated, and unknown worlds under the opt-in policy %s', async (options) => {
+  expect(await lint(call(options), noMainWorldId)).toHaveLength(0);
 });
 
 test.each([
@@ -111,6 +202,87 @@ test.each([
   if (source) expect(messages[0].column).toBe(payload(value).indexOf(source) + 1);
 });
 
+test.each([
+  ['new Date("2026-01-01T00:00:00Z")', 'Date', 'date', 'args[0]'],
+  ['new Map([["key","value"]])', 'Map', 'serializedObject', 'args[0]'],
+  ['new Set(["value"])', 'Set', 'serializedObject', 'args[0]'],
+  ['/title/gi', 'RegExp', 'serializedObject', 'args[0]'],
+  ['new RegExp("title","gi")', 'RegExp', 'serializedObject', 'args[0]'],
+  ['({lookup:new Map([["key","value"]])})', 'Map', 'serializedObject', 'args[0].lookup'],
+  ['new SetLike(["value"])', 'Set', 'serializedObject', 'args[0]'],
+  ['new URL("https://example.com/path")', 'URL', 'serializedUrl', 'args[0]'],
+  ['new URLSearchParams("q=mv3")', 'URLSearchParams', 'serializedObject', 'args[0]'],
+  ['new Uint8Array([1,2])', 'Uint8Array', 'uint8Array', 'args[0]'],
+  ['new ArrayBuffer(2)', 'ArrayBuffer', 'arrayBuffer', 'args[0]'],
+])('reports built-in argument transfer problems for %s', async (value, type, id, path) => {
+  const code = value === 'new SetLike(["value"])' ? `const SetLike=Set;${payload(value)}` : payload(value);
+  const messages = await lint(code, lossId);
+  expect(messages.map((message) => message.messageId)).toEqual([id]);
+  expect(messages[0].message).toContain(type);
+  expect(messages[0].message).toContain(path);
+  if (id === 'serializedObject') {
+    expect(messages[0].message).toContain('Chrome transfers it as a plain object');
+    expect(messages[0].message).toContain("Gecko's current `JSON.stringify(args)` path predicts `{}`");
+    expect(messages[0].message).toContain('The injected value loses its built-in data and behavior');
+  }
+  if (id === 'serializedUrl') {
+    expect(messages[0].message).toContain('Chrome transfers it as a plain object');
+    expect(messages[0].message).toContain("Gecko's current `JSON.stringify(args)` path predicts an href string through `URL.toJSON()`");
+  }
+  if (id === 'uint8Array') {
+    expect(messages[0].message).toContain('Chrome rejects it as unserializable');
+    expect(messages[0].message).toContain("Gecko's current `JSON.stringify(args)` path predicts a plain object with byte values under numeric index keys");
+  }
+  if (id === 'arrayBuffer') {
+    expect(messages[0].message).toContain('Chrome rejects it as unserializable');
+    expect(messages[0].message).toContain("Gecko's current `JSON.stringify(args)` path predicts `{}`");
+    expect(messages[0].message).toContain('buffer bytes are not represented');
+  }
+  if (type === 'Date') {
+    expect(messages[0].message).toContain('Chrome drops its timestamp');
+    expect(messages[0].message).toContain('Firefox serializes it as an ISO string');
+  }
+});
+
+test('reports Date resolved through constructor and options aliases', async () => {
+  const code =
+    'const DateCtor=Date;const happenedAt=new DateCtor("2026-01-01T00:00:00Z");' +
+    'const data={happenedAt};const base={target:{tabId:1},func:(input)=>input,args:[data]};' +
+    'const options={...base};const run=browser.scripting.executeScript;run(options);';
+  const messages = await lint(code, lossId);
+  expect(messages.map((message) => message.messageId)).toEqual(['date']);
+  expect(messages[0].message).toContain('args[0].happenedAt');
+});
+
+test.each([
+  'const entries=new Map();entries.set("key","value");' + payload('entries'),
+  'const values=new Set();values.add("value");' + payload('values'),
+])('retains built-in Map and Set identity after standard mutators: %s', async (code) => {
+  expect((await lint(code, lossId)).map((message) => message.messageId)).toEqual(['serializedObject']);
+});
+
+test('retains Date identity after standard Date methods', async () => {
+  const code = 'const date=new Date("2026-01-01");date.getTime();date.setTime(0);' + payload('date');
+  expect((await lint(code, lossId)).map((message) => message.messageId)).toEqual(['date']);
+});
+
+test('leaves custom serializers and shadowed built-ins uncertain', async () => {
+  const customSerializer =
+    'const entries=new Map([["key","value"]]);entries.toJSON=()=>({entries:Object.fromEntries(entries)});' + payload('entries');
+  const customDateSerializer =
+    'const date=new Date("2026-01-01");date.toJSON=()=>"custom-date";' + payload('date');
+  const shadowedBuiltin = 'function Map(){return {ok:true}}const value=new Map();' + payload('value');
+  const unknownConstruction = 'function create(){return new Uint8Array([1])}' + payload('create()');
+  const unknownDate = 'function create(){return new Date("2026-01-01")}' + payload('create()');
+  const escapedDate = 'const date=new Date("2026-01-01");mutate(date);' + payload('date');
+  expect(await lint(customSerializer, lossId)).toHaveLength(0);
+  expect(await lint(customDateSerializer, lossId)).toHaveLength(0);
+  expect(await lint(shadowedBuiltin, lossId)).toHaveLength(0);
+  expect(await lint(unknownConstruction, lossId)).toHaveLength(0);
+  expect(await lint(unknownDate, lossId)).toHaveLength(0);
+  expect(await lint(escapedDate, lossId)).toHaveLength(0);
+});
+
 test('reports the nested value path', async () => {
   const messages = await lint(payload('{settings:{callback:()=>1}}'), lossId);
   expect(messages[0].messageId).toBe('omitted');
@@ -120,7 +292,6 @@ test('reports the nested value path', async () => {
 test.each([
   'const shared={ok:true};' + payload('[shared,shared]'),
   payload('{name:"mv3",items:[1,true,null]}'),
-  payload('new Date("2026-01-01")'),
   payload('{toJSON(){return {ok:true}},bad:()=>1}'),
   'const x={bad:()=>1};escape(x);' + payload('x'),
   'const x={bad:()=>1};if(flag)x.bad=null;' + payload('x'),
@@ -276,8 +447,6 @@ test('treats setter side effects as uncertain without executing user code', asyn
   const code = 'const data={bad:undefined};const object={set value(x){data.bad=x}};object.value=1;' + payload('data');
   expect(await lint(code, lossId)).toHaveLength(0);
 });
-
-const closureId = '@mertcreates/mv3/no-execute-script-closure';
 
 test.each(Object.keys(plugin.rules))('handles exported self-referencing methods with %s enabled', async (name) => {
   const code = 'export const commands={open(){},again(){return commands.open()}};';

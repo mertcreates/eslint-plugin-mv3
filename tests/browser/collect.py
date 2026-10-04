@@ -22,8 +22,13 @@ for browser in ['chrome', 'firefox']:
 class Collector(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
         self.end_headers()
-        self.wfile.write(b'<html><title>MV3 transfer fixture</title></html>')
+        self.wfile.write(
+            b'<html><title>MV3 transfer fixture</title><body>'
+            b'<script>globalThis.__mv3PageSentinel = "page-world";</script>'
+            b'</body></html>'
+        )
 
     def do_POST(self):
         result = json.loads(self.rfile.read(int(self.headers['Content-Length'])))

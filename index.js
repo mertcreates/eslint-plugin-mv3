@@ -2,11 +2,13 @@ import noExecuteScriptClosureRule from './rules/no-execute-script-closure.js';
 
 import argumentLoss from './rules/no-execute-script-argument-loss.js';
 import validOptions from './rules/valid-execute-script-options.js';
+import noMainWorld from './rules/no-main-world.js';
 
 export const rules = {
   'no-execute-script-closure': noExecuteScriptClosureRule,
   'valid-execute-script-options': validOptions,
   'no-execute-script-argument-loss': argumentLoss,
+  'no-main-world': noMainWorld,
 };
 
 const plugin = {

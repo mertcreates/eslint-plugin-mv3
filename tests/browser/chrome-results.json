@@ -5,7 +5,7 @@
       "name": "plain",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": null,
@@ -30,7 +30,7 @@
       "name": "object-bigint",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": null,
@@ -48,7 +48,7 @@
       "name": "array-bigint",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": [
@@ -70,7 +70,7 @@
       "name": "array-cycle",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": [
@@ -92,7 +92,7 @@
       "name": "cycle",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": null,
@@ -130,7 +130,7 @@
       "name": "object-loss",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": null,
@@ -148,7 +148,7 @@
       "name": "sparse",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": [
@@ -172,7 +172,7 @@
       "name": "array-loss",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": [
@@ -202,7 +202,7 @@
       "name": "date",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": null,
@@ -220,7 +220,7 @@
       "name": "shared",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": {
             "arrayTypes": [
@@ -239,6 +239,122 @@
           }
         }
       ]
+    },
+    {
+      "name": "map",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "set",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "regexp-literal",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "regexp-constructor",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "url",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "url-search-params",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "arrayTypes": null,
+            "infinity": false,
+            "json": "{}",
+            "keys": [],
+            "nan": false,
+            "tag": "[object Object]",
+            "type": "object"
+          }
+        }
+      ]
+    },
+    {
+      "name": "uint8-array",
+      "error": "Error: Unserializable argument passed."
+    },
+    {
+      "name": "array-buffer",
+      "error": "Error: Unserializable argument passed."
     }
   ],
   "optionResults": [
@@ -246,7 +362,7 @@
       "name": "null-func",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": true
         }
@@ -256,7 +372,7 @@
       "name": "null-files",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -266,7 +382,7 @@
       "name": "null-args",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -276,7 +392,7 @@
       "name": "null-world",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -286,7 +402,7 @@
       "name": "null-allFrames",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -296,7 +412,7 @@
       "name": "null-frameIds",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -306,7 +422,7 @@
       "name": "null-documentIds",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -316,7 +432,7 @@
       "name": "null-injectImmediately",
       "response": [
         {
-          "documentId": "D489B2F01A5089A342C31AE28F2F197D",
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
           "frameId": 0,
           "result": 42
         }
@@ -325,6 +441,112 @@
     {
       "name": "false-func",
       "error": "TypeError: Error in invocation of scripting.executeScript(scripting.ScriptInjection injection, optional function callback): Error at parameter 'injection': Error at property 'func': Invalid type: expected function, found boolean."
+    }
+  ],
+  "functionResults": [
+    {
+      "name": "method",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": null
+        }
+      ],
+      "state": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {}
+        }
+      ]
+    },
+    {
+      "name": "class-method",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": null
+        }
+      ],
+      "state": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {}
+        }
+      ]
+    },
+    {
+      "name": "declaration",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": "MV3 transfer fixture"
+        }
+      ],
+      "state": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "declaration": "ran"
+          }
+        }
+      ]
+    },
+    {
+      "name": "generator",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {}
+        }
+      ],
+      "state": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": {
+            "declaration": "ran"
+          }
+        }
+      ]
+    }
+  ],
+  "worldResults": [
+    {
+      "world": "omitted",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": null
+        }
+      ]
+    },
+    {
+      "world": "ISOLATED",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": null
+        }
+      ]
+    },
+    {
+      "world": "MAIN",
+      "response": [
+        {
+          "documentId": "5F3093992CF799C208FC6BF41F8E952E",
+          "frameId": 0,
+          "result": "page-world"
+        }
+      ]
     }
   ]
 }

@@ -25,6 +25,16 @@ export const optionProblems = (options) => {
   else if (isAbsentOption(func) && isAbsentOption(files)) add('missingSource', options, 'func/files');
   if (active(args) && (active(files) || isAbsentOption(func))) add('argsWithoutFunc', args, 'args');
   if (active(func) && func.kind !== 'function') add('invalidType', func, 'func (function)');
+  if (active(func) && func.kind === 'function' && func.methodSyntax)
+    problems.push({
+      messageId: 'methodFunction',
+      node: func.methodNode ?? func.node ?? options.node,
+    });
+  else if (active(func) && func.kind === 'function' && func.generator)
+    problems.push({
+      messageId: 'generatorFunction',
+      node: func.node ?? options.node,
+    });
   if (active(files) && files.kind !== 'array') add('invalidType', files, 'files (array)');
   if (active(args) && args.kind !== 'array') add('invalidType', args, 'args (array)');
   if (files.kind === 'array' && !files.opaque) {
@@ -84,6 +94,10 @@ export default {
       missingTabId: 'Provide target.tabId.',
       invalidType: '{{field}} has an invalid value type.',
       invalidWorld: 'world must be ISOLATED or MAIN.',
+      methodFunction:
+        'Method-syntax functions cannot be reconstructed as standalone injected functions. Use a function declaration, function expression, or arrow function.',
+      generatorFunction:
+        'executeScript calls this generator function but does not advance its iterator, so the generator body does not run. Use a regular function and advance the iterator there if needed.',
       frameConflict: 'allFrames: true cannot accompany frameIds.',
       documentConflict: 'documentIds cannot accompany frameIds.',
     },

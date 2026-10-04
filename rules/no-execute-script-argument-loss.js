@@ -14,6 +14,16 @@ export default {
     schema: [],
     messages: {
       rejected: '{{path}} contains BigInt: Chrome and Firefox reject this argument.',
+      serializedObject:
+        '{{path}} contains {{type}}: Chrome transfers it as a plain object; Gecko\'s current `JSON.stringify(args)` path predicts `{}` for an unmodified value in Firefox. The injected value loses its built-in data and behavior.',
+      serializedUrl:
+        '{{path}} contains URL: Chrome transfers it as a plain object; Gecko\'s current `JSON.stringify(args)` path predicts an href string through `URL.toJSON()` in Firefox. The injected value is not a URL in either browser.',
+      uint8Array:
+        '{{path}} contains Uint8Array: Chrome rejects it as unserializable; Gecko\'s current `JSON.stringify(args)` path predicts a plain object with byte values under numeric index keys in Firefox, so the injected value is not a Uint8Array.',
+      arrayBuffer:
+        '{{path}} contains ArrayBuffer: Chrome rejects it as unserializable; Gecko\'s current `JSON.stringify(args)` path predicts `{}` for an unmodified value in Firefox, so its buffer bytes are not represented.',
+      date:
+        '{{path}} contains Date: Chrome drops its timestamp; Firefox serializes it as an ISO string. The injected value is not a Date in either browser.',
       cycle: '{{path}} forms a cycle: Firefox rejects it; Chrome loses the circular reference.',
       bigintField: '{{path}} contains BigInt: Firefox rejects the argument; Chrome omits this field.',
       bigintElement: '{{path}} contains BigInt: Firefox rejects the argument; Chrome converts this element to null.',
@@ -64,6 +74,16 @@ export default {
                   : null;
         if (value.kind === 'primitive' && typeof value.value === 'bigint') {
           add(position === 'argument' ? 'rejected' : position === 'array' ? 'bigintElement' : 'bigintField', 'BigInt');
+          return;
+        }
+        if (value.kind === 'object' && value.serializedType) {
+          const serializedType = value.serializedType;
+          if (serializedType === 'Date') add('date', serializedType);
+          else if (['Map', 'Set', 'RegExp', 'URLSearchParams'].includes(serializedType))
+            add('serializedObject', serializedType);
+          else if (serializedType === 'URL') add('serializedUrl', serializedType);
+          else if (serializedType === 'Uint8Array') add('uint8Array', serializedType);
+          else if (serializedType === 'ArrayBuffer') add('arrayBuffer', serializedType);
           return;
         }
         if (type) {
